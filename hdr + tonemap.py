@@ -213,10 +213,10 @@ def main():
     splib2 = np.array([1/800,1/640,1/400,1/320,1/200,1/160,1/100,1/80,1/50,1/40,1/25,1/20,1/13,1/10,1/6,1/5])
     splib1 = np.array([1/4,1/5,1/8,1/10,1/15,1/20,1/30,1/50,1/60,1/80,1/125,1/160,1/250,1/320,1/500,1/640])
     sphall1 = np.array([1/1000,1/640,1/400,1/250,1/160,1/100,1/80,1/60,1/40,1/25,1/15,1/10,1/6,1/4,0.4,0.6])
-    if filename == "photo_hallway1" or "aligned_hallway1":
+    if dirname == "photo_hallway1" or dirname == "aligned_hallway1":
         for i in range(16):
             B[i] = np.log(sphall1[i])
-    elif filename == "photo_library1" or "aligned_library1":
+    elif dirname == "photo_library1" or dirname == "aligned_library1":
         for i in range(16):
             B[i] = np.log(splib1[i])
     else:
