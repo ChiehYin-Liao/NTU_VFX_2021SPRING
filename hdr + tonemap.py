@@ -73,7 +73,7 @@ def photographic_global(R, d, a):
     Ld = (Lm * (1 + (Lm / Lwhite ** 2))) / (1 + Lm)
     pg_hdr = np.clip(np.array(Ld * 255), 0, 255).astype(np.uint8)
 
-    cv2.imwrite("tonemap_photographic_global_alignlib.jpg", pg_hdr)
+    cv2.imwrite("tonemap_photographic_global_lib1.jpg", pg_hdr)
     return pg_hdr
 
 
@@ -112,15 +112,16 @@ def photographic_local(R, d=1e-6, a=0.5):
         Ld = Lm / (1 + Ls)
         pl_hdr[:,:,channel] = np.clip(np.array(Ld * 255), 0, 255).astype(np.uint8)
 
-    cv2.imwrite("tonemap_photographic_local_alignlib.jpg", pl_hdr)
+    cv2.imwrite("tonemap_photographic_local_lib1.jpg", pl_hdr)
 
     return pl_hdr
 
 
 def main():
 
-    dirname = 'aligned_library2'
+    dirname = 'photo_library1'
     imgs = []
+
     for filename in np.sort(os.listdir(dirname)):
         if osp.splitext(filename)[1] in ['.jpg', '.png', '.JPG']:
             img = cv2.imread(osp.join(dirname,filename))
@@ -209,9 +210,18 @@ def main():
         ZR[i, 15] = int(img16[index_i[i], index_j[i], 2])
 
     B = np.zeros(16)
-    sp = np.array([1/1000,1/640,1/400,1/250,1/160,1/100,1/80,1/60,1/40,1/25,1/15,1/10,1/6,1/4,0.4,0.6])
-    for i in range(16):
-        B[i] = np.log(sp[i])
+    splib2 = np.array([1/800,1/640,1/400,1/320,1/200,1/160,1/100,1/80,1/50,1/40,1/25,1/20,1/13,1/10,1/6,1/5])
+    splib1 = np.array([1/4,1/5,1/8,1/10,1/15,1/20,1/30,1/50,1/60,1/80,1/125,1/160,1/250,1/320,1/500,1/640])
+    sphall1 = np.array([1/1000,1/640,1/400,1/250,1/160,1/100,1/80,1/60,1/40,1/25,1/15,1/10,1/6,1/4,0.4,0.6])
+    if filename == "photo_hallway1" or "aligned_hallway1":
+        for i in range(16):
+            B[i] = np.log(sphall1[i])
+    elif filename == "photo_library1" or "aligned_library1":
+        for i in range(16):
+            B[i] = np.log(splib1[i])
+    else:
+        for i in range(16):
+            B[i] = np.log(splib2[i])
 
     l = 5
     w = np.zeros(256)
@@ -279,7 +289,7 @@ def main():
 
             HDRimg[i, j, 2] = math.exp(lnER)
 
-    cv2.imwrite("HDRalignlib.hdr", HDRimg.astype(np.float32))
+    cv2.imwrite("HDRlib1.hdr", HDRimg.astype(np.float32))
     photographic_global(HDRimg, 1e-6, 0.5)
     photographic_local(HDRimg)
 
