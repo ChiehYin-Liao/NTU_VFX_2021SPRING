@@ -5,6 +5,30 @@ import math
 import random
 import os.path as osp
 import os
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+# display response curve
+def display_g(f,g,h):
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+    for c in range(3):
+        ax = axes[c]
+        x = np.arange(256)
+        ax.set_ylabel('Z : Pixel Value')
+        ax.set_xlabel('E : Log Exposure')
+        if c == 0:
+            y = [f[i] for i in x]
+            ax.plot(y,x,color = 'blue', linewidth = 2)
+        elif c == 1:
+            y = [g[i] for i in x]
+            ax.plot(y,x,color = 'green', linewidth = 2)
+        else:
+            y = [h[i] for i in x]
+            ax.plot(y,x,color = 'red', linewidth = 2)
+
+    plt.show()
+    fig.savefig('response_curve_hall1.png', bbox_inches = 'tight', dpi =256)
 
 
 # weighting function value for pixel value z
@@ -50,13 +74,6 @@ def gsolve(Z, B, l, w):
         A[k, i + 2] = l * w[i + 1]
         k = k + 1
 
-    # U, S, V = la.svd(A)
-    # Sigma = np.zeros((V.shape[0],U.shape[0]))
-    # for i in range(0, Sigma.shape[0]):
-    #     for j in range(0, Sigma.shape[1]):
-    #         Sigma[i,i] = S[i]
-    #
-    # x = np.transpose(V).dot(Sigma).dot(np.transpose(U)).dot(b)
     A_inv = np.linalg.pinv(A)
     x = np.dot(A_inv, b)
     g = x[0:n]
@@ -119,7 +136,7 @@ def photographic_local(R, d=1e-6, a=0.5):
 
 def main():
 
-    dirname = 'photo_library1'
+    dirname = 'photo_library2'
     imgs = []
 
     for filename in np.sort(os.listdir(dirname)):
@@ -289,10 +306,10 @@ def main():
 
             HDRimg[i, j, 2] = math.exp(lnER)
 
-    cv2.imwrite("HDRlib1.hdr", HDRimg.astype(np.float32))
-    photographic_global(HDRimg, 1e-6, 0.5)
-    photographic_local(HDRimg)
-
+    cv2.imwrite("HDRlibrary2.hdr", HDRimg.astype(np.float32))
+    # photographic_global(HDRimg, 1e-6, 0.5)
+    # photographic_local(HDRimg)
+    # display_g(gB,gG,gR)
 
 if __name__ == '__main__':
     main()
