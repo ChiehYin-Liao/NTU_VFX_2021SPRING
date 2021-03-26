@@ -5,6 +5,30 @@ import math
 import random
 import os.path as osp
 import os
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+# display response curve
+def display_g(f,g,h):
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+    for c in range(3):
+        ax = axes[c]
+        x = np.arange(256)
+        ax.set_ylabel('Z : Pixel Value')
+        ax.set_xlabel('E : Log Exposure')
+        if c == 0:
+            y = [f[i] for i in x]
+            ax.plot(y,x,color = 'blue', linewidth = 2)
+        elif c == 1:
+            y = [g[i] for i in x]
+            ax.plot(y,x,color = 'green', linewidth = 2)
+        else:
+            y = [h[i] for i in x]
+            ax.plot(y,x,color = 'red', linewidth = 2)
+
+    plt.show()
+    fig.savefig('response_curve_library2.png', bbox_inches = 'tight', dpi =256)
 
 
 # weighting function value for pixel value z
@@ -50,13 +74,6 @@ def gsolve(Z, B, l, w):
         A[k, i + 2] = l * w[i + 1]
         k = k + 1
 
-    # U, S, V = la.svd(A)
-    # Sigma = np.zeros((V.shape[0],U.shape[0]))
-    # for i in range(0, Sigma.shape[0]):
-    #     for j in range(0, Sigma.shape[1]):
-    #         Sigma[i,i] = S[i]
-    #
-    # x = np.transpose(V).dot(Sigma).dot(np.transpose(U)).dot(b)
     A_inv = np.linalg.pinv(A)
     x = np.dot(A_inv, b)
     g = x[0:n]
@@ -64,7 +81,7 @@ def gsolve(Z, B, l, w):
 
     return g, lE
 
-
+# tonemapping algorithm(global)
 def photographic_global(R, d, a):
     Lw = R
     Lw_bar = np.exp(np.mean(np.log(d + Lw)))
@@ -73,10 +90,11 @@ def photographic_global(R, d, a):
     Ld = (Lm * (1 + (Lm / Lwhite ** 2))) / (1 + Lm)
     pg_hdr = np.clip(np.array(Ld * 255), 0, 255).astype(np.uint8)
 
-    cv2.imwrite("tonemap_photographic_global_alignlib.jpg", pg_hdr)
+    cv2.imwrite("tonemap_photographic_global_lib2.jpg", pg_hdr)
     return pg_hdr
 
 
+#tonemapping algorithm(local)
 def gaussian_blur(img, smax=25, a=1.0, fi=8.0, e=0.01):
     m = img.shape[0]
     n = img.shape[1]
@@ -112,15 +130,23 @@ def photographic_local(R, d=1e-6, a=0.5):
         Ld = Lm / (1 + Ls)
         pl_hdr[:,:,channel] = np.clip(np.array(Ld * 255), 0, 255).astype(np.uint8)
 
-    cv2.imwrite("tonemap_photographic_local_alignlib.jpg", pl_hdr)
+    cv2.imwrite("tonemap_photographic_local_lib2.jpg", pl_hdr)
 
     return pl_hdr
 
 
+
 def main():
 
+<<<<<<< HEAD
     dirname = 'photo_library1'
+=======
+    # select dir
+    dirname = 'photo_library2'
+>>>>>>> ab70e084478e925ce7d33f40ee7c29810ffba2de
     imgs = []
+
+    # read img
     for filename in np.sort(os.listdir(dirname)):
         if osp.splitext(filename)[1] in ['.jpg', '.png', '.JPG']:
             img = cv2.imread(osp.join(dirname,filename))
@@ -128,6 +154,7 @@ def main():
 
     img1, img2, img3, img4, img5, img6, img7, img8, img9, img10, img11, img12, img13, img14, img15, img16 = imgs[0], imgs[1], imgs[2], imgs[3], imgs[4], imgs[5], imgs[6], imgs[7], imgs[8], imgs[9], imgs[10], imgs[11], imgs[12], imgs[13], imgs[14], imgs[15]
 
+    # downsampling with 1/4 scale
     img1 = cv2.pyrDown(cv2.pyrDown(img1))
     img2 = cv2.pyrDown(cv2.pyrDown(img2))
     img3 = cv2.pyrDown(cv2.pyrDown(img3))
@@ -146,6 +173,7 @@ def main():
     img16 = cv2.pyrDown(cv2.pyrDown(img16))
 
 
+    # random select 50 pixels
     random.seed(7414)
     sample = 50
     indices = random.sample(range(img1.shape[0] * img1.shape[1]), sample)
@@ -155,6 +183,7 @@ def main():
         index_i[i] = indices[i] // img1.shape[1]
         index_j[i] = indices[i] % img1.shape[1]
 
+    # 50 pixels, 16 images, 3 channels
     ZB = np.zeros((sample, 16), dtype=int)
     ZG = np.zeros((sample, 16), dtype=int)
     ZR = np.zeros((sample, 16), dtype=int)
@@ -208,7 +237,10 @@ def main():
         ZR[i, 14] = int(img15[index_i[i], index_j[i], 2])
         ZR[i, 15] = int(img16[index_i[i], index_j[i], 2])
 
+
+    # shutter speed log domain
     B = np.zeros(16)
+<<<<<<< HEAD
     # library_1
     sp = np.array([1/4,1/5,1/8,1/10,1/15,1/20,1/30,1/50,1/60,1/80,1/125,1/160,1/250,1/320,1/500,1/640])
     # hallway_2
@@ -217,15 +249,35 @@ def main():
     #sp = np.array([1/800,1/640,1/400,1/320,1/200,1/160,1/100,1/80,1/50,1/45,1/25,1/20,1/13,1/10,1/6,1/5])
     for i in range(16):
         B[i] = np.log(sp[i])
+=======
+    splib2 = np.array([1/800,1/640,1/400,1/320,1/200,1/160,1/100,1/80,1/50,1/40,1/25,1/20,1/13,1/10,1/6,1/5])
+    splib1 = np.array([1/4,1/5,1/8,1/10,1/15,1/20,1/30,1/50,1/60,1/80,1/125,1/160,1/250,1/320,1/500,1/640])
+    sphall1 = np.array([1/1000,1/640,1/400,1/250,1/160,1/100,1/80,1/60,1/40,1/25,1/15,1/10,1/6,1/4,0.4,0.6])
+    if dirname == "photo_hallway1" or dirname == "aligned_hallway1":
+        for i in range(16):
+            B[i] = np.log(sphall1[i])
+    elif dirname == "photo_library1" or dirname == "aligned_library1":
+        for i in range(16):
+            B[i] = np.log(splib1[i])
+    else:
+        for i in range(16):
+            B[i] = np.log(splib2[i])
+>>>>>>> ab70e084478e925ce7d33f40ee7c29810ffba2de
 
+    # constraint weight lambda(changable)
     l = 5
+
+    # weight function of 0 ~ 255 intensity
     w = np.zeros(256)
     for i in range(0, 256):
         w[i] = wf(i)
 
+    # slove least square to obtain response curve g
     gB, LEB = gsolve(ZB, B, l, w)
     gG, LEG = gsolve(ZG, B, l, w)
     gR, LER = gsolve(ZR, B, l, w)
+
+    # HDR img reconstruction
     HDRimg = np.zeros(img1.shape)
     for i in range(0, HDRimg.shape[0]):
         for j in range(0, HDRimg.shape[1]):
@@ -284,10 +336,15 @@ def main():
 
             HDRimg[i, j, 2] = math.exp(lnER)
 
-    cv2.imwrite("HDRalignlib.hdr", HDRimg.astype(np.float32))
+    # save file 
+    cv2.imwrite("HDRlibrary2.hdr", HDRimg.astype(np.float32))
+
+    # tonemapping 
     photographic_global(HDRimg, 1e-6, 0.5)
     photographic_local(HDRimg)
 
+    # display response curve
+    display_g(gB,gG,gR)
 
 if __name__ == '__main__':
     main()

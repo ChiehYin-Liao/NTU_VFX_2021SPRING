@@ -1,0 +1,19 @@
+# Number of Images
+29
+# Filename  1/shutter_speed f/stop gain(db) ND_filters
+IMG_001    1/4   0
+IMG_002    1/5   8 0 0
+IMG_003    1/8   8 0 0
+IMG_004    1/10   8 0 0
+IMG_005    1/15   8 0 0
+IMG_006    1/20   8 0 0
+IMG_007    1/30   8 0 0
+IMG_008    1/50   8 0 0
+IMG_009    1/60   8 0 0
+IMG_0010    1/80   8 0 0
+IMG_0011    1/125    8 0 0
+IMG_0012    1/160    8 0 0
+IMG_0013    1/250    8 0 0
+IMG_0014    1/320    8 0 0
+IMG_0015    1/500    8 0 0
+IMG_0016    1/640    8 0 0
