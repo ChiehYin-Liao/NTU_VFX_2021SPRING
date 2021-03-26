@@ -28,7 +28,7 @@ def display_g(f,g,h):
             ax.plot(y,x,color = 'red', linewidth = 2)
 
     plt.show()
-    fig.savefig('response_curve_hall1.png', bbox_inches = 'tight', dpi =256)
+    fig.savefig('response_curve_library2.png', bbox_inches = 'tight', dpi =256)
 
 
 # weighting function value for pixel value z
@@ -81,7 +81,7 @@ def gsolve(Z, B, l, w):
 
     return g, lE
 
-
+# tonemapping algorithm(global)
 def photographic_global(R, d, a):
     Lw = R
     Lw_bar = np.exp(np.mean(np.log(d + Lw)))
@@ -90,10 +90,11 @@ def photographic_global(R, d, a):
     Ld = (Lm * (1 + (Lm / Lwhite ** 2))) / (1 + Lm)
     pg_hdr = np.clip(np.array(Ld * 255), 0, 255).astype(np.uint8)
 
-    cv2.imwrite("tonemap_photographic_global_lib1.jpg", pg_hdr)
+    cv2.imwrite("tonemap_photographic_global_lib2.jpg", pg_hdr)
     return pg_hdr
 
 
+#tonemapping algorithm(local)
 def gaussian_blur(img, smax=25, a=1.0, fi=8.0, e=0.01):
     m = img.shape[0]
     n = img.shape[1]
@@ -129,16 +130,19 @@ def photographic_local(R, d=1e-6, a=0.5):
         Ld = Lm / (1 + Ls)
         pl_hdr[:,:,channel] = np.clip(np.array(Ld * 255), 0, 255).astype(np.uint8)
 
-    cv2.imwrite("tonemap_photographic_local_lib1.jpg", pl_hdr)
+    cv2.imwrite("tonemap_photographic_local_lib2.jpg", pl_hdr)
 
     return pl_hdr
 
 
+
 def main():
 
+    # select dir
     dirname = 'photo_library2'
     imgs = []
 
+    # read img
     for filename in np.sort(os.listdir(dirname)):
         if osp.splitext(filename)[1] in ['.jpg', '.png', '.JPG']:
             img = cv2.imread(osp.join(dirname,filename))
@@ -146,6 +150,7 @@ def main():
 
     img1, img2, img3, img4, img5, img6, img7, img8, img9, img10, img11, img12, img13, img14, img15, img16 = imgs[0], imgs[1], imgs[2], imgs[3], imgs[4], imgs[5], imgs[6], imgs[7], imgs[8], imgs[9], imgs[10], imgs[11], imgs[12], imgs[13], imgs[14], imgs[15]
 
+    # downsampling with 1/4 scale
     img1 = cv2.pyrDown(cv2.pyrDown(img1))
     img2 = cv2.pyrDown(cv2.pyrDown(img2))
     img3 = cv2.pyrDown(cv2.pyrDown(img3))
@@ -164,6 +169,7 @@ def main():
     img16 = cv2.pyrDown(cv2.pyrDown(img16))
 
 
+    # random select 50 pixels
     random.seed(7414)
     sample = 50
     indices = random.sample(range(img1.shape[0] * img1.shape[1]), sample)
@@ -173,6 +179,7 @@ def main():
         index_i[i] = indices[i] // img1.shape[1]
         index_j[i] = indices[i] % img1.shape[1]
 
+    # 50 pixels, 16 images, 3 channels
     ZB = np.zeros((sample, 16), dtype=int)
     ZG = np.zeros((sample, 16), dtype=int)
     ZR = np.zeros((sample, 16), dtype=int)
@@ -226,6 +233,8 @@ def main():
         ZR[i, 14] = int(img15[index_i[i], index_j[i], 2])
         ZR[i, 15] = int(img16[index_i[i], index_j[i], 2])
 
+
+    # shutter speed log domain
     B = np.zeros(16)
     splib2 = np.array([1/800,1/640,1/400,1/320,1/200,1/160,1/100,1/80,1/50,1/40,1/25,1/20,1/13,1/10,1/6,1/5])
     splib1 = np.array([1/4,1/5,1/8,1/10,1/15,1/20,1/30,1/50,1/60,1/80,1/125,1/160,1/250,1/320,1/500,1/640])
@@ -240,14 +249,20 @@ def main():
         for i in range(16):
             B[i] = np.log(splib2[i])
 
+    # constraint weight lambda(changable)
     l = 5
+
+    # weight function of 0 ~ 255 intensity
     w = np.zeros(256)
     for i in range(0, 256):
         w[i] = wf(i)
 
+    # slove least square to obtain response curve g
     gB, LEB = gsolve(ZB, B, l, w)
     gG, LEG = gsolve(ZG, B, l, w)
     gR, LER = gsolve(ZR, B, l, w)
+
+    # HDR img reconstruction
     HDRimg = np.zeros(img1.shape)
     for i in range(0, HDRimg.shape[0]):
         for j in range(0, HDRimg.shape[1]):
@@ -306,10 +321,15 @@ def main():
 
             HDRimg[i, j, 2] = math.exp(lnER)
 
+    # save file 
     cv2.imwrite("HDRlibrary2.hdr", HDRimg.astype(np.float32))
-    # photographic_global(HDRimg, 1e-6, 0.5)
-    # photographic_local(HDRimg)
-    # display_g(gB,gG,gR)
+
+    # tonemapping 
+    photographic_global(HDRimg, 1e-6, 0.5)
+    photographic_local(HDRimg)
+
+    # display response curve
+    display_g(gB,gG,gR)
 
 if __name__ == '__main__':
     main()
