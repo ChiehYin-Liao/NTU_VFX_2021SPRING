@@ -5,19 +5,19 @@ import os
 import os.path as osp
 import random
 
-dirname = 'Memorial_SourceImages'
-images, images_grayscale = [], []
+dirname = 'photo_library2'
+
+images = []
 
 for filename in np.sort(os.listdir(dirname)):
-    if osp.splitext(filename)[1] in ['.png', '.jpg']:
+    if osp.splitext(filename)[1] in ['.png', '.jpg', '.JPG']:
         img = cv2.imread(osp.join(dirname, filename))
         images.append(img)
-        img = cv2.imread(osp.join(dirname, filename), cv2.IMREAD_GRAYSCALE)
-        images_grayscale.append(img)
 
-#for i in range(num):
-#    filename = "gray" + str(i) + ".png"
-#    cv2.imwrite(filename, images_grayscale[i])
+def shrink(images):
+    for img in images:
+        h, w = img.shape[:2]
+        img = cv2.resize(img, (w//4, h//4))
 
 def translation(x, y):
     Matrix = np.float32([[1, 0, x],[0, 1, y]])
@@ -29,7 +29,7 @@ def median_img(img):
     median_img[np.where(img < median)] = 0
     return median_img
 
-def get_shift_vector(src, trg, x, y, threshold=4):
+def get_shift_vector(src, trg, x, y, threshold=10):
     h, w = trg.shape[:2]
     new_tx, new_ty = 0, 0
     min_distinct_pixel = np.inf
@@ -65,8 +65,29 @@ def get_image_alignment_vector(src, trg, depth=6):
 
     return fx, fy
     
-def image_align(src, trg, depth=6):
+def image_align(src, trg, depth=4):
     h, w = trg.shape[:2]
-    fx, fy = self.get_image_alignment_vector(src, trg, depth)
+    target = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+    source = cv2.cvtColor(trg, cv2.COLOR_BGR2GRAY)
+    fx, fy = get_image_alignment_vector(source, target, depth)
+    print (fx, fy)
     return cv2.warpAffine(src, translation(fx, fy), (w, h))
+   
+def main():
+
+    p = len(images)
     
+    for i in range(p):
+        if (i != 8):
+            src = np.array(images[i])
+            trg = np.array(images[8])
+            images[i] = image_align(src, trg, 6)
+    
+    
+    for i in range(p):
+        filename = "IMG_hallway_" + str(i) + ".jpg"
+        cv2.imwrite(filename, images[i])
+    
+
+if __name__ == '__main__':
+    main()

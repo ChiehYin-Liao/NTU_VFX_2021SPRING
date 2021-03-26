@@ -119,7 +119,7 @@ def photographic_local(R, d=1e-6, a=0.5):
 
 def main():
 
-    dirname = 'aligned_library2'
+    dirname = 'photo_library1'
     imgs = []
     for filename in np.sort(os.listdir(dirname)):
         if osp.splitext(filename)[1] in ['.jpg', '.png', '.JPG']:
@@ -209,7 +209,12 @@ def main():
         ZR[i, 15] = int(img16[index_i[i], index_j[i], 2])
 
     B = np.zeros(16)
-    sp = np.array([1/1000,1/640,1/400,1/250,1/160,1/100,1/80,1/60,1/40,1/25,1/15,1/10,1/6,1/4,0.4,0.6])
+    # library_1
+    sp = np.array([1/4,1/5,1/8,1/10,1/15,1/20,1/30,1/50,1/60,1/80,1/125,1/160,1/250,1/320,1/500,1/640])
+    # hallway_2
+    #sp = np.array([1/1000,1/640,1/400,1/250,1/160,1/100,1/80,1/60,1/40,1/25,1/15,1/10,1/6,1/4,0.4,0.6])
+    # library_2
+    #sp = np.array([1/800,1/640,1/400,1/320,1/200,1/160,1/100,1/80,1/50,1/45,1/25,1/20,1/13,1/10,1/6,1/5])
     for i in range(16):
         B[i] = np.log(sp[i])
 
