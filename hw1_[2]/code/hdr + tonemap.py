@@ -193,7 +193,7 @@ def photographic_local(R, d=1e-6, a=0.5):
 def main():
 
     # select dir
-    dirname = 'photo_library2'
+    dirname = 'data/original photos'
     imgs = []
 
     # read img
@@ -212,23 +212,23 @@ def main():
 
     img1, img2, img3, img4, img5, img6, img7, img8, img9, img10, img11, img12, img13, img14, img15, img16 = imgs[0], imgs[1], imgs[2], imgs[3], imgs[4], imgs[5], imgs[6], imgs[7], imgs[8], imgs[9], imgs[10], imgs[11], imgs[12], imgs[13], imgs[14], imgs[15]
 
-    # downsampling with 1/4 scale
-    # img1 = cv2.pyrDown(cv2.pyrDown(img1))
-    # img2 = cv2.pyrDown(cv2.pyrDown(img2))
-    # img3 = cv2.pyrDown(cv2.pyrDown(img3))
-    # img4 = cv2.pyrDown(cv2.pyrDown(img4))
-    # img5 = cv2.pyrDown(cv2.pyrDown(img5))
-    # img6 = cv2.pyrDown(cv2.pyrDown(img6))
-    # img7 = cv2.pyrDown(cv2.pyrDown(img7))
-    # img8 = cv2.pyrDown(cv2.pyrDown(img8))
-    # img9 = cv2.pyrDown(cv2.pyrDown(img9))
-    # img10 = cv2.pyrDown(cv2.pyrDown(img10))
-    # img11 = cv2.pyrDown(cv2.pyrDown(img11))
-    # img12 = cv2.pyrDown(cv2.pyrDown(img12))
-    # img13 = cv2.pyrDown(cv2.pyrDown(img13))
-    # img14 = cv2.pyrDown(cv2.pyrDown(img14))
-    # img15 = cv2.pyrDown(cv2.pyrDown(img15))
-    # img16 = cv2.pyrDown(cv2.pyrDown(img16))
+    #　downsampling with 1/4 scale
+    img1 = cv2.pyrDown(cv2.pyrDown(img1))
+    img2 = cv2.pyrDown(cv2.pyrDown(img2))
+    img3 = cv2.pyrDown(cv2.pyrDown(img3))
+    img4 = cv2.pyrDown(cv2.pyrDown(img4))
+    img5 = cv2.pyrDown(cv2.pyrDown(img5))
+    img6 = cv2.pyrDown(cv2.pyrDown(img6))
+    img7 = cv2.pyrDown(cv2.pyrDown(img7))
+    img8 = cv2.pyrDown(cv2.pyrDown(img8))
+    img9 = cv2.pyrDown(cv2.pyrDown(img9))
+    img10 = cv2.pyrDown(cv2.pyrDown(img10))
+    img11 = cv2.pyrDown(cv2.pyrDown(img11))
+    img12 = cv2.pyrDown(cv2.pyrDown(img12))
+    img13 = cv2.pyrDown(cv2.pyrDown(img13))
+    img14 = cv2.pyrDown(cv2.pyrDown(img14))
+    img15 = cv2.pyrDown(cv2.pyrDown(img15))
+    img16 = cv2.pyrDown(cv2.pyrDown(img16))
 
 
     # random select 50 pixels
