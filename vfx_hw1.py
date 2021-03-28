@@ -29,7 +29,7 @@ def median_img(img):
     median_img[np.where(img < median)] = 0
     return median_img
 
-def get_shift_vector(src, trg, x, y, threshold=10):
+def get_shift_vector(src, trg, x, y, threshold=4):
     h, w = trg.shape[:2]
     new_tx, new_ty = 0, 0
     min_distinct_pixel = np.inf
@@ -52,7 +52,7 @@ def get_shift_vector(src, trg, x, y, threshold=10):
 		    
     return x + new_fx, y + new_fy
 
-def get_image_alignment_vector(src, trg, depth=6):
+def get_image_alignment_vector(src, trg, depth=4):
     if depth == 0:
         fx, fy = get_shift_vector(src, trg, 0, 0)
         
@@ -81,7 +81,7 @@ def main():
         if (i != 8):
             src = np.array(images[i])
             trg = np.array(images[8])
-            images[i] = image_align(src, trg, 6)
+            images[i] = image_align(src, trg, 4)
     
     
     for i in range(p):
