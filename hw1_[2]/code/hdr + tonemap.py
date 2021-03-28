@@ -193,7 +193,7 @@ def photographic_local(R, d=1e-6, a=0.5):
 def main():
 
     # select dir
-    dirname = 'data/original photos'
+    dirname = '../data/original photos'
     imgs = []
 
     # read img
@@ -204,6 +204,7 @@ def main():
 
     # img alignment
     p = len(imgs)
+    print(p)
     for i in range(p):
         if (i != 8):
             src = np.array(imgs[i])
